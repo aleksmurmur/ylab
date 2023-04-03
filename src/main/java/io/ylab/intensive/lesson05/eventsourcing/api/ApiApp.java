@@ -8,6 +8,7 @@ public class ApiApp {
     // Тут пишем создание PersonApi, запуск и демонстрацию работы
     AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(Config.class);
     applicationContext.start();
+    applicationContext.registerShutdownHook();
     PersonApi personApi = applicationContext.getBean(PersonApi.class);
 
     personApi.savePerson(1L, "bo", "bo", "jack");
@@ -31,6 +32,7 @@ public class ApiApp {
     personApi.savePerson(3L, "Ivan", "Ivanov", "Ivanovich");
     Thread.sleep(1000);
     System.out.println(personApi.findAll().size());//2
-    // пишем взаимодействие с PersonApi
+
+    applicationContext.close();// пишем взаимодействие с PersonApi
   }
 }

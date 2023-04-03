@@ -1,4 +1,4 @@
-package io.ylab.intensive.lesson05.eventsourcing.db.consumer;
+package io.ylab.intensive.lesson05.eventsourcing.db;
 
 public record PairDto<K, V>(
          K key,

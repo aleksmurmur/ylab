@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
+import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,27 +13,27 @@ import java.sql.SQLException;
 
 @Repository
 public class PersonDAOImpl implements PersonDAO {
+    private static final Logger logger = LoggerFactory.getLogger(PersonDAOImpl.class);
 
-    private static final  String createQuery = """
+    private static final String CREATE = """
                 INSERT INTO person(person_id, first_name, last_name, middle_name) VALUES (?,?,?,?)
                 """;
-    private static final String updateQuery = """
+    private static final String UPDATE = """
                 UPDATE person SET first_name=?, last_name=?, middle_name=? WHERE person_id=?
                  """;
-    private static final     String deleteQuery = """
+    private static final String DELETE = """
                 DELETE  FROM person WHERE person_id=?
                 """;
 
-    private final static Logger logger = LoggerFactory.getLogger(PersonDAOImpl.class);
-    private final DataSource dataSource;
+    private Connection connection;
 
-    public PersonDAOImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public PersonDAOImpl(Connection connection) {
+            this.connection = connection;
     }
 
     @Override
     public void save(Person person) {
-        try (Connection connection = dataSource.getConnection()) {
+        try {
             if (checkIfExists(connection, person.getId())) {
                 update(connection, person);
             } else {
@@ -46,8 +46,7 @@ public class PersonDAOImpl implements PersonDAO {
 
     @Override
     public void delete(Long id) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
+        try (PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.setLong(1, id);
             int deleted = statement.executeUpdate();
             if (deleted == 0) {
@@ -60,7 +59,7 @@ public class PersonDAOImpl implements PersonDAO {
     }
 
     private void update(Connection connection, Person person) throws SQLException {
-        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+        try (PreparedStatement updateStatement = connection.prepareStatement(UPDATE)) {
             updateStatement.setString(1, person.getName());
             updateStatement.setString(2, person.getLastName());
             updateStatement.setString(3, person.getMiddleName());
@@ -71,7 +70,7 @@ public class PersonDAOImpl implements PersonDAO {
     }
 
     private void create(Connection connection, Person person) throws SQLException {
-        try (PreparedStatement createStatement = connection.prepareStatement(createQuery)) {
+        try (PreparedStatement createStatement = connection.prepareStatement(CREATE)) {
             createStatement.setLong(1, person.getId());
             createStatement.setString(2, person.getName());
             createStatement.setString(3, person.getLastName());

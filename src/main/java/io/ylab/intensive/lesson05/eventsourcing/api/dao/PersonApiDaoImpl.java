@@ -25,17 +25,16 @@ public class PersonApiDaoImpl implements PersonApiDao {
             SELECT * FROM person
             """;
 
-    private final DataSource dataSource;
+    private final Connection connection;
 
-    public PersonApiDaoImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public PersonApiDaoImpl(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
     public Person findPerson(Long personId) {
         Person person = null;
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(getByIdQuery)) {
+        try (PreparedStatement statement = connection.prepareStatement(getByIdQuery)) {
             statement.setLong(1, personId);
             ResultSet rs = statement.executeQuery();
 
@@ -53,8 +52,7 @@ public class PersonApiDaoImpl implements PersonApiDao {
     @Override
     public List<Person> findAll() {
         List<Person> people = new ArrayList<>();
-        try (java.sql.Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(getAllQuery);
+        try (PreparedStatement statement = connection.prepareStatement(getAllQuery);
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
