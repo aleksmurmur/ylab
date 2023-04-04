@@ -1,49 +1,44 @@
-package io.ylab.intensive.lesson05.eventsourcing.db.consumer;
+package io.ylab.intensive.lesson05.messagefilter.rabbit;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import io.ylab.intensive.lesson05.eventsourcing.Action;
-import io.ylab.intensive.lesson05.eventsourcing.db.PairDto;
-import io.ylab.intensive.lesson05.eventsourcing.db.service.DbAppService;
+import io.ylab.intensive.lesson05.messagefilter.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static io.ylab.intensive.lesson05.eventsourcing.db.Config.QUEUE_NAME;
+import static io.ylab.intensive.lesson05.messagefilter.Config.INPUT_QUEUE;
 
 @Component
-@Primary
-public class DbAppConsumerImpl implements DbAppConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(DbAppConsumerImpl.class);
+public class ConsumerImpl implements RabbitConsumer {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
+
 
     private Channel channel;
-    private DbAppService service;
+    private MessageService messageService;
 
-    public DbAppConsumerImpl(Channel channel, DbAppService dbAppService) {
+    public ConsumerImpl(Channel channel, MessageService messageService) {
         this.channel = channel;
-        this.service = dbAppService;
+        this.messageService = messageService;
     }
 
     @Override
-    public void consume() {
+    public void listen() {
         try {
-            channel.basicConsume(QUEUE_NAME, false, "customTag",
+            channel.basicConsume(INPUT_QUEUE, false, "input",
                     new DefaultConsumer(channel) {
                         @Override
                         public void handleDelivery(String consumerTag,
                                                    Envelope envelope,
                                                    AMQP.BasicProperties properties,
                                                    byte[] body) throws IOException {
-                            String routingKey = envelope.getRoutingKey();
                             long deliveryTag = envelope.getDeliveryTag();
 
-                            PairDto<Action, String> message = new PairDto<>(Action.valueOf(routingKey), new String(body));
-                            service.processMessage(message);
+                            messageService.processMessage(new String(body));
 
                             channel.basicAck(deliveryTag, false);
                         }

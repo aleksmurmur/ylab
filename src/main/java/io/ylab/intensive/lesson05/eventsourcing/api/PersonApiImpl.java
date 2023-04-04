@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ylab.intensive.lesson05.eventsourcing.Person;
 import io.ylab.intensive.lesson05.eventsourcing.api.dao.PersonApiDao;
-import io.ylab.intensive.lesson05.eventsourcing.api.producer.Action;
+import io.ylab.intensive.lesson05.eventsourcing.Action;
 import io.ylab.intensive.lesson05.eventsourcing.api.producer.PersonApiProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

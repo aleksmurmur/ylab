@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.ylab.intensive.lesson05.DbUtil;
+import io.ylab.intensive.lesson05.eventsourcing.Action;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 @ComponentScan("io.ylab.intensive.lesson05.eventsourcing.db")
 public class Config {
     public static final String QUEUE_NAME = "queue";
+    public static final String EXCHANGE_NAME = "exc";
 
     @Bean
     public DataSource dataSource() throws SQLException {
@@ -85,6 +87,8 @@ public class Config {
         try {
             Channel channel = connection.createChannel();
             channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, Action.SAVE.name());
+            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, Action.DELETE.name());
             return channel;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);

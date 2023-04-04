@@ -2,8 +2,8 @@ package io.ylab.intensive.lesson05.eventsourcing.db.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ylab.intensive.lesson05.eventsourcing.Action;
 import io.ylab.intensive.lesson05.eventsourcing.Person;
-import io.ylab.intensive.lesson05.eventsourcing.db.Action;
 import io.ylab.intensive.lesson05.eventsourcing.db.PairDto;
 import io.ylab.intensive.lesson05.eventsourcing.db.dao.PersonDAO;
 import org.slf4j.Logger;
@@ -13,8 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.ylab.intensive.lesson05.eventsourcing.db.Action.DELETE;
-import static io.ylab.intensive.lesson05.eventsourcing.db.Action.SAVE;
+import static io.ylab.intensive.lesson05.eventsourcing.Action.DELETE;
+import static io.ylab.intensive.lesson05.eventsourcing.Action.SAVE;
+
 
 @Service
 public class DbAppServiceImpl implements DbAppService {

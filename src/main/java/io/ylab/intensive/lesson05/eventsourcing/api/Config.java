@@ -5,6 +5,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import io.ylab.intensive.lesson05.eventsourcing.Action;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -76,6 +77,8 @@ public class Config {
       Channel channel = connection.createChannel();
       channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
       channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+      channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, Action.SAVE.name());
+      channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, Action.DELETE.name());
       return channel;
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);

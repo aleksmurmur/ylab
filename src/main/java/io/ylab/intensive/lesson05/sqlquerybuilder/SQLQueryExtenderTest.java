@@ -15,7 +15,7 @@ public class SQLQueryExtenderTest {
         System.out.println(tables.size());
         // вот так сгенерируем запросы для всех таблиц что есть в БД
         for (String tableName : tables) {
-            //В чати писал возрващать null если нет столбцов и выводить в консоль.
+            //В чате писали возрващать null если нет столбцов и выводить в консоль.
             //В консоль логгер выводит, а null не будем печатать
             String query = queryBuilder.queryForTable(tableName);
             if (query != null) {
